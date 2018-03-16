@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Http\Request;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,4 +15,16 @@
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::post('/API/employee/hours', function (Request $request) {
+    return $request->all();
+});
+
+Route::get('/API/employee/{id}', function (Request $request){
+    return "TODO";
+});
+
+Route::get('/API/employee/all', function (Request $request){
+    return "TODO";
 });

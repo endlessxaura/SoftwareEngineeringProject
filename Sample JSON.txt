@@ -1,0 +1,21 @@
+{
+	"empr" : {
+		"ident" : {
+			
+		},
+		"emp" : {
+			"ident" : {
+			
+			},
+			"hours" : [
+				{
+					"date" : "XX/YY/ZZ",
+					"start" : "XX:YY:ZZ",
+					"end" : "XX:YY:ZZ",
+					"UOM" : "Units",
+					"numb" : 0
+				}
+				]
+		}
+	}
+}
