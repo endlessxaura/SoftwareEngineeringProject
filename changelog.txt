@@ -3,3 +3,6 @@ Initial release. Contains Laravel template code.
 
 3/16/2018
 Minor changes to authentication and routes, adapting them to the project.
+
+3/26/2018
+Added JWT capabilities to the server. Created a "/authenticate" route which can take a username and a password to return a JWT. Actually using the JWT is a work in progress that will require changes to the database. Server routes enroute.
