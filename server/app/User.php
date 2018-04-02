@@ -9,7 +9,7 @@ class User extends Authenticatable
 {
     //Internal storage variables
     protected $table = 'users';
-    protected $primaryKey = 'employer_id';
+    protected $primaryKey = 'user_id';
     public $timestamps = FALSE;
 
     //Hidden keys

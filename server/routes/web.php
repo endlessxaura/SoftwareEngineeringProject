@@ -18,6 +18,10 @@ Route::get('/', function () {
 });
 
 //Authentication
+Route::post('/getPassword', function(Request $request){
+     return Hash::make($request->password);
+});
+
 Route::post('/authenticate', 'AuthController@authenticate');
 
 Route::get('/test', 'AuthenticatedController@test');
