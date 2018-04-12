@@ -22,5 +22,14 @@ Route::post('/authenticate', 'AuthController@authenticate');
 
 Route::get('/user', 'AuthenticatedController@getAuthenticatedUser');
 
-//Employees
-Route::get('/employees', 'AuthenticatedController@employees');
+//Employer
+Route::get('/employer', 'EmployerController@getEmployer');
+
+//Employee
+Route::get('/employees', 'EmployeeController@getEmployees');
+
+Route::get('/employee/{id}', 'EmployeeController@getEmployee');
+
+Route::get('/employee/{id}/jobs', 'EmployeeController@getEmployeeJobs');
+
+//Jobs

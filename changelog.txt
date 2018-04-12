@@ -9,3 +9,6 @@ Added JWT capabilities to the server. Created a "/authenticate" route which can 
 
 4/2/2018
 Finished authentication and changed database to match. JWT can now grab users based on the token received.
+
+4/12/2018
+Added routes for employer and employees. See documentation on drive.
