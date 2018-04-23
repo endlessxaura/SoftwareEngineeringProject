@@ -12,3 +12,6 @@ Finished authentication and changed database to match. JWT can now grab users ba
 
 4/12/2018
 Added routes for employer and employees. See documentation on drive.
+
+4/23/2018
+Added routes for jobs and hours. See documentation on drive. Temporarily changed to avoid token refresh until further notice.

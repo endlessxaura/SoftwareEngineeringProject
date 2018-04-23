@@ -14,7 +14,7 @@ class AuthenticatedController extends Controller
     * @return void
     */
     public function __construct(){
-        $this->middleware(['jwt.auth', 'jwt.refresh']);
+        $this->middleware(['jwt.auth']);
     }
 
     //General Functions

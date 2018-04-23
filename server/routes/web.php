@@ -33,3 +33,15 @@ Route::get('/employee/{id}', 'EmployeeController@getEmployee');
 Route::get('/employee/{id}/jobs', 'EmployeeController@getEmployeeJobs');
 
 //Jobs
+Route::get('/jobs', 'JobController@getJobs');
+
+Route::get('/job/{id}', 'JobController@getJob');
+
+Route::get('/job/{id}/employees', 'JobController@getJobEmployees');
+
+//Hours
+Route::get('/hours', 'HourController@getHours');
+
+Route::post('/hours', 'HourController@postHours');
+
+Route::post('/hours/update', 'HourController@updateHours');

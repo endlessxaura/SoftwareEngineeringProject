@@ -15,7 +15,7 @@ class EmployeeController extends EmployerController
         #NOTE: DO NOT USE THE DATABASE EMPLOYEE ID
         $employer = $this->getEmployerObject();
         if($employer != NULL){
-            return DB::table('employee')->where('employer_id', $employer->employer_id)->where('employer_employee_ID', $id)->get();
+            return DB::table('employee')->where('employer_id', $employer->employer_id)->where('employer_employee_ID', $id)->first();
         } else {
             return NULL;
         }
@@ -28,7 +28,7 @@ class EmployeeController extends EmployerController
         if($employer != NULL){
             return DB::table('employee')->where('employer_id', $employer->employer_id)->get();
         } else {
-            return response()->json(['failed_to_authenticate'], 404);
+            return response()->json(['failed_to_authenticate'], 401);
         }
     }
 
@@ -40,7 +40,7 @@ class EmployeeController extends EmployerController
         if($employer != NULL){
             return DB::table('employee')->where('employer_id', $employer->employer_id)->where('employer_employee_ID', $id)->get();
         } else {
-            return response()->json(['failed_to_authenticate'], 404);
+            return response()->json(['failed_to_authenticate'], 401);
         }
     }
 
@@ -50,11 +50,17 @@ class EmployeeController extends EmployerController
         #NOTE: DO NOT USE THE DATABASE EMPLOYEE ID
         $employer = $this->getEmployerObject();
         if($employer != NULL){
-            $employee = $this->getEmployeeObject();
+            $employee = $this->getEmployeeObject($id);
             if($employee != NULL){
-                return DB::table('employee_job')->where('employer_id', $employer->employer_id)->where('employee_id', $employee->employee_id)->get();
+                $relation = DB::table('employee_job')->where("employee_id", $employee->employee_id)->where('employer_id', $employer->employer_id)->get();
+                $jobQueries = [];
+                for ($i = 0; $i < sizeof($relation); $i++){
+                    $job = DB::table('job')->where("job_id", $relation[$i]->job_id)->first();
+                    $jobQueries[] = $job;
+                }
+                return $jobQueries;
             }
         }
-        return response()->json(['failed_to_authenticate'], 404);
+        return response()->json(['failed_to_authenticate'], 401);
     }
 }
