@@ -6,27 +6,46 @@ use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
-class HourController extends EmployerController
+class HourController extends JobController
 {
     //General functions
-    function getHoursObject (Request $request) {
+    function getHoursObject (Request $request, $onlyOne = FALSE) {
         #POST: returns a specified hours object
+        #NOTE: It will return the FIRST one it finds
         $employer = $this->getEmployerObject();
         if ($employer != NULL) {
-            $query = DB::table('hours')->where('employer_id', $employer->employer_id);
-            if ($request->has('employee_id')) {
-                $query = $query->where('employee_id', $request->employee_id);
+            if($onlyOne){
+                if ($request->has('employee_id') &&
+                    $request->has('job_id') &&
+                    $request->has('date') &&
+                    $request->has('shift_number') &&
+                    ($request->has('quantity') || ($request->has('start') && $request->has('end')))) 
+                {
+                    $query = DB::table('hours')->where('employer_id', $employer->employer_id);
+                    $query = $query->where('employee_id', $request->employee_id);
+                    $query = $query->where('job_id', $request->job_id);
+                    $query = $query->where('date', $request->date);
+                    $query = $query->where('shift_number', $request->shift_number);
+                    return $query->first();
+                } else {
+                    return NULL;
+                }
+            } else {
+                $query = DB::table('hours')->where('employer_id', $employer->employer_id);
+                if ($request->has('employee_id')) {
+                    $query = $query->where('employee_id', $request->employee_id);
+                }
+                if ($request->has('job_id')) {
+                    $query = $query->where('job_id', $request->job_id);
+                }
+                if ($request->has('date')) {
+                    $query = $query->where('date', $request->date);
+                }
+                if ($request->has('shift_number')){
+                    $query = $query->where('shift_number', $request->shift_number);
+                }
+                return $query->get();
             }
-            if ($request->has('job_id')) {
-                $query = $query->where('job_id', $request->job_id);
-            }
-            if ($request->has('date')) {
-                $query = $query->where('date', $request->date);
-            }
-            if ($request->has('shift_number')){
-                $query = $query->where('shift_number', $request->shift_number);
-            }
-            return $query->first();
         } else {
             return NULL;
         }
@@ -72,16 +91,26 @@ class HourController extends EmployerController
                 $request->has('shift_number') &&
                 ($request->has('quantity') || ($request->has('start') && $request->has('end')))) 
             {
-                $quantity;
+                $quantity = -1;
+                $job = $this->getJobObject ($request->job_id);
                 if($request->has('quantity')) {
                     $quantity = $request->quantity;
                 } else {
-                    $date1 = new \DateTime($request->start);
-                    $date2 = new \DateTime($request->end);
-                    $interval = $date1->diff($date2);
-                    $quantity = ($interval->s / 60) + 
-                                ($interval->h) +
-                                ($interval->d * 24);
+                    if($job->UOM == "Dollars"){
+                        return response()->json(['invalid UOM'], 400);
+                    } else if ($job->UOM == "Hourly") {
+                        $date1 = new \DateTime($request->start);
+                        $date2 = new \DateTime($request->end);
+                        $interval = $date1->diff($date2);
+                        $quantity = ($interval->s / 60) + 
+                                    ($interval->h) +
+                                    ($interval->d * 24);
+                    } else {
+                        return response()->json(['bad UOM'], 400);
+                    }
+                }
+                if ($quantity < 0) {
+                    return response()->json(['negative quantity'], 400);
                 }
                 DB::table('hours')->insert([
                     'employer_id' => $employer->employer_id,
@@ -108,18 +137,22 @@ class HourController extends EmployerController
         #POST:  updates the specified hours object
         $employer = $this->getEmployerObject();
         if ($employer != NULL) {
-            $hours = $this->getHoursObject($request);
+            $hours = $this->getHoursObject($request, $onlyOne = TRUE);
             if($hours != NULL){
                 $quantity = $hours->quantity;
-                if($request->has('quantity')) {
-                    $quantity = $request->quantity;
-                } else if ($request->has('start') && $request->has('end')){
+                $job = $this->getJobObject ($request->job_id);
+                if($job->UOM == "Dollars"){
+                    return response()->json(['invalid UOM'], 400);
+                } else if ($job->UOM == "Hourly") {
                     $date1 = new \DateTime($request->start);
                     $date2 = new \DateTime($request->end);
                     $interval = $date1->diff($date2);
                     $quantity = ($interval->s / 60) + 
                                 ($interval->h) +
                                 ($interval->d * 24);
+                }
+                if ($quantity < 0) {
+                    return response()->json(['negative quantity'], 400);
                 }
                 $start = $hours->start;
                 $end = $hours->end;
@@ -137,6 +170,26 @@ class HourController extends EmployerController
                 return response()->json(['hours updated'], 204);
             } else {
                 return response()->json(['object not found'], 404);
+            }
+        } else {
+            return response()->json(['failed_to_authenticate'], 401);
+        }
+    }
+
+    function deleteHours (Request $request){
+        #POST: deletes the hours
+        $employer = $this->getEmployerObject();
+        if ($employer != NULL) {
+            $hours = $this->getHoursObject($request, $onlyOne = TRUE);
+            if($hours != NULL) {
+                $query = DB::table('hours')->where('employer_id', $hours->employer_id);
+                $query = $query->where('employee_id', $hours->employee_id);
+                $query = $query->where('job_id', $hours->job_id);
+                $query = $query->where('date', $hours->date);
+                $query = $query->where('shift_number', $hours->shift_number);
+                DB::table('hours')->delete();
+            } else {
+                return response()->json(['missing arguments'], 401);
             }
         } else {
             return response()->json(['failed_to_authenticate'], 401);

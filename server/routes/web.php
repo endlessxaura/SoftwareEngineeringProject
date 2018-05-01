@@ -45,3 +45,10 @@ Route::get('/hours', 'HourController@getHours');
 Route::post('/hours', 'HourController@postHours');
 
 Route::post('/hours/update', 'HourController@updateHours');
+
+Route::post('/hours/delete', 'HourController@deleteHours');
+
+//Batch files
+Route::post('/batchFile', 'BatchFileController@processFile');
+
+Route::get('/batchFile', 'BatchFileController@sendFile');

@@ -59,6 +59,8 @@ class EmployeeController extends EmployerController
                     $jobQueries[] = $job;
                 }
                 return $jobQueries;
+            } else {
+                return response()->json(['employee not found'], 404);
             }
         }
         return response()->json(['failed_to_authenticate'], 401);
